@@ -8,10 +8,15 @@ RUN apk add --no-cache git ca-certificates
 # Copy source - in CI we clone from GitHub; for local build copy context
 COPY . .
 # Alternative for Umbrel store build context: clone directly if no local source
+# Use robust copy that includes hidden files and doesn't rely on glob expansion
 RUN if [ ! -f go.mod ]; then \
-      apk add --no-cache curl && \
-      git clone https://github.com/AFSlayer/antigravity-server.git /tmp/src && \
-      cp -a /tmp/src/* . && cp -a /tmp/src/.* . 2>/dev/null || true; \
+      echo "go.mod not found in context, cloning upstream..." && \
+      rm -rf /tmp/src && \
+      git clone --depth 1 https://github.com/AFSlayer/antigravity-server.git /tmp/src && \
+      cp -a /tmp/src/. . && \
+      echo "Cloned, ls:" && ls -la | head -20; \
+    else \
+      echo "Using local go.mod, ls:" && ls -la | head -20; \
     fi
 RUN go mod download
 ARG TARGETOS=linux
