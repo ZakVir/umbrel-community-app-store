@@ -1,0 +1,63 @@
+name: Build and push Antigravity Server image
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "zakvir-antigravity-server/**"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from manifest
+        id: version
+        run: |
+          VER=$(grep '^version:' zakvir-antigravity-server/umbrel-app.yml | head -1 | sed -E 's/version: *"([^"]+)".*/\1/')
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "Detected version: $VER"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: zakvir-antigravity-server
+          file: zakvir-antigravity-server/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/zakvir/antigravity-server:${{ steps.version.outputs.version }}
+            ghcr.io/zakvir/antigravity-server:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ghcr.io/zakvir/antigravity-server:${{ steps.version.outputs.version }} --raw | head -c 500
+          echo ""
+          echo "To pin digest, update docker-compose.yml:"
+          docker buildx imagetools inspect ghcr.io/zakvir/antigravity-server:${{ steps.version.outputs.version }} --format '{{json .Manifest}}' | head -c 1000 || true

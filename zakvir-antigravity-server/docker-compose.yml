@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: zakvir-antigravity-server_server_1
+      APP_PORT: 8765
+
+  server:
+    # NOTE: After first GitHub Actions build, replace tag with pinned digest:
+    # docker buildx imagetools inspect ghcr.io/zakvir/antigravity-server:0.2.7
+    # and update to ghcr.io/zakvir/antigravity-server:0.2.7@sha256:<digest>
+    image: ghcr.io/zakvir/antigravity-server:0.2.7
+    restart: on-failure
+    user: "1000:1000"
+    init: true
+    volumes:
+      - ${APP_DATA_DIR}/data/agy-home:/data/agy-home
+      - ${APP_DATA_DIR}/data/workspace:/data/workspace
+      - ${APP_DATA_DIR}/data/gemini:/home/agy/.gemini
+    environment:
+      HOME: /home/agy
+      AGY_HOME: /data/agy-home
+      AGY_WORKSPACE_ROOT: /data/workspace
+      AGY_PORT: 8765
+      AGY_BIND: 0.0.0.0
+      AGY_PASSWORD: ${APP_PASSWORD}
+      AGY_TRUSTED_PROXIES: ${APP_TRUSTED_PROXIES}
+      AGY_LANGUAGE_SERVER: /data/agy-home/language_server
+      AGY_PUBLIC_URL: http://${DEVICE_DOMAIN_NAME}:${APP_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8765/__agy/login || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s

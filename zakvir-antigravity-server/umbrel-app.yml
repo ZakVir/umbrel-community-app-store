@@ -1,0 +1,46 @@
+manifestVersion: 1
+id: zakvir-antigravity-server
+category: developer
+name: Antigravity Server
+version: "0.2.7"
+tagline: Use the Antigravity IDE from your phone via Umbrel
+icon: https://raw.githubusercontent.com/AFSlayer/antigravity-server/main/docs/assets/control-panel.png
+description: >-
+  Antigravity Server adds a second, mobile-optimized front door to Google Antigravity.
+
+
+  It runs the official Antigravity language_server headlessly on your Umbrel, behind your own password, and patches the desktop web bundle on-the-fly for touch devices — restoring the New Conversation (+) button, conversation kebab menu (Delete/Rename/Pin/Archive), always-visible Undo/Copy on messages, iOS keyboard fixes, and chunked streaming uploads for large files.
+
+
+  The server proxies the Antigravity core (language_server --standalone) on port 8765 and can run alongside the official Google relay at antigravity.google.com. Authentication is PBKDF2, sessions are 30 days, and uploads are isolated to your workspace.
+
+
+  On Umbrel, data persists under App Data: AGY_HOME (credentials/sessions), workspace folder, and Gemini OAuth token. The container auto-downloads language_server from Google on first start (storage.googleapis.com/antigravity-public — no redistribution). Open the app to sign in with Google via the web UI or copy ~/.gemini/jetski-standalone-oauth-token from a desktop.
+
+
+  Tips: Add to Home Screen for fullscreen PWA on iOS/Android. Works behind Umbrel's app_proxy; WebSocket/SSE streaming is preserved.
+
+
+releaseNotes: >-
+  Initial Umbrel Community Store release, tracking upstream v0.2.7.
+
+  - Mobile UX patches (touch controls, keyboard, uploads)
+  - Headless serve mode with auto language_server download
+  - Persistent workspace and Gemini auth
+
+developer: AFSlayer
+website: https://github.com/AFSlayer/antigravity-server
+dependencies: []
+repo: https://github.com/AFSlayer/antigravity-server
+support: https://github.com/AFSlayer/antigravity-server/issues
+port: 8767
+gallery:
+  - https://raw.githubusercontent.com/AFSlayer/antigravity-server/main/docs/assets/compare-agy.png
+  - https://raw.githubusercontent.com/AFSlayer/antigravity-server/main/docs/assets/compare-official.png
+  - https://raw.githubusercontent.com/AFSlayer/antigravity-server/main/docs/assets/desktop.png
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+deterministicPassword: true
+submitter: ZakVir
+submission: https://github.com/ZakVir/umbrel-community-app-store
