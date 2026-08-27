@@ -7,7 +7,7 @@ services:
       APP_PORT: 8765
 
   server:
-    image: ghcr.io/zakvir/antigravity-server:0.2.7@sha256:3d09ac4a0b2546a0b606e44c405149fcf597014f22221b252fd4b1002e67a1bf
+    image: ghcr.io/zakvir/antigravity-server:0.2.7@sha256:93a60f3ccfbe729960cab264d71d91e52c399a973467d240b5763ccb2f99fa69
     restart: on-failure
     user: "1000:1000"
     init: true
@@ -30,4 +30,4 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 180s
