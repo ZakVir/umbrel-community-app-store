@@ -2,31 +2,32 @@ manifestVersion: 1
 id: zakvir-antigravity-server
 category: developer
 name: Antigravity Server
-version: "0.2.7"
-tagline: Use the Antigravity IDE from your phone via Umbrel
+version: "0.2.8"
+tagline: Use the Antigravity IDE from your phone via Umbrel — now open, no login
 icon: https://raw.githubusercontent.com/AFSlayer/antigravity-server/main/docs/assets/control-panel.png
 description: >-
   Antigravity Server adds a second, mobile-optimized front door to Google Antigravity.
 
 
-  It runs the official Antigravity language_server headlessly on your Umbrel, behind your own password, and patches the desktop web bundle on-the-fly for touch devices — restoring the New Conversation (+) button, conversation kebab menu (Delete/Rename/Pin/Archive), always-visible Undo/Copy on messages, iOS keyboard fixes, and chunked streaming uploads for large files.
+  It runs the official Antigravity language_server headlessly on your Umbrel and patches the desktop web bundle on-the-fly for touch devices — restoring the New Conversation (+) button, conversation kebab menu (Delete/Rename/Pin/Archive), always-visible Undo/Copy on messages, iOS keyboard fixes, and chunked streaming uploads for large files.
 
 
-  The server proxies the Antigravity core (language_server --standalone) on port 8765 and can run alongside the official Google relay at antigravity.google.com. Authentication is PBKDF2, sessions are 30 days, and uploads are isolated to your workspace.
+  v0.2.8: Open access — beginning authentication removed. Set AGY_DISABLE_AUTH=true and PROXY_AUTH_ADD=false so the app opens directly at http://umbrel.local:8767 without Umbrel or Antigravity login. Data persists under App Data: AGY_HOME, workspace, Gemini OAuth token. Egress firewall restricts outside connections to only Antigravity model APIs (generativelanguage.googleapis.com, daily-cloudcode-pa.googleapis.com, accounts.google.com, oauth2.googleapis.com, storage.googleapis.com) plus DNS/LAN — all other outbound is dropped via iptables (NET_ADMIN). The container auto-downloads language_server from Google on first start (storage.googleapis.com/antigravity-public — no redistribution).
 
 
-  On Umbrel, data persists under App Data: AGY_HOME (credentials/sessions), workspace folder, and Gemini OAuth token. The container auto-downloads language_server from Google on first start (storage.googleapis.com/antigravity-public — no redistribution). Open the app to sign in with Google via the web UI or copy ~/.gemini/jetski-standalone-oauth-token from a desktop.
+  To re-enable auth, set AGY_DISABLE_AUTH=false and remove PROXY_AUTH_ADD. To allow other hosts, set AGY_EGRESS_ALLOW_HOSTS or AGY_EGRESS_RESTRICT=0.
 
 
   Tips: Add to Home Screen for fullscreen PWA on iOS/Android. Works behind Umbrel's app_proxy; WebSocket/SSE streaming is preserved.
 
 
 releaseNotes: >-
-  Initial Umbrel Community Store release, tracking upstream v0.2.7.
+  v0.2.8: Remove beginning authentication (AGY_DISABLE_AUTH) and lock egress.
 
-  - Mobile UX patches (touch controls, keyboard, uploads)
-  - Headless serve mode with auto language_server download
-  - Persistent workspace and Gemini auth
+  - No login: Umbrel proxy auth disabled (PROXY_AUTH_ADD=false) and Antigravity password bypass (AGY_DISABLE_AUTH=true)
+  - Egress firewall: iptables NET_ADMIN restricts outbound to only model APIs + OAuth + DNS/LAN (configurable via AGY_EGRESS_ALLOW_HOSTS, disable via AGY_EGRESS_RESTRICT=0)
+  - Base image debian:bookworm-slim (fixes Alpine musl glibc exec failure)
+  - Healthcheck 180s for 163MB language_server download
 
 developer: AFSlayer
 website: https://github.com/AFSlayer/antigravity-server
@@ -41,6 +42,5 @@ gallery:
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-deterministicPassword: true
 submitter: ZakVir
 submission: https://github.com/ZakVir/umbrel-community-app-store
